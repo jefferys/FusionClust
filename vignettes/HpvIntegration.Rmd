@@ -195,16 +195,39 @@ knitr::kable( head( clusteredEnds[selectRow, ] ))
 
 Now that we have fusion end ranges, report fusions by cluster.
 ```{r}
-clusteredFusions <- clusterFusions(fusions, window= windowSize)
-knitr::kable(head(clusteredFusions, 10))
+clusterAnnotatedFusions <- clusterFusions(fusions, window= windowSize)
+knitr::kable(head(clusterAnnotatedFusions, 10))
+clusterAnnotatedFusionsFile <- "clusterAnnotatedFusions.tsv"
+clusterAnnotatedFusionsPath <- file.path( dataRoot, clusterAnnotatedFusionsFile )
+write.table(clusterAnnotatedFusions, file = clusterAnnotatedFusionsPath, sep="\t")
 ```
 
 Ok, now that we have fusion clusters identified (single and double ended) lets merge counts within each sample by fusion id
 
 ```{r}
-mergedClusterCounts <- mergeCountsByCluster( clusteredFusions )
+mergedClusterCounts <- mergeCountsByCluster( clusterAnnotatedFusions )
 knitr::kable(head(mergedClusterCounts, 10))
 ```
+
+Write out the fusion clusters file.
+```{r}
+mergedClusterCountsFile <- "mergedClusterCounts.tsv"
+mergedClusterCountsPath <- file.path( dataRoot, mergedClusterCountsFile )
+write.table(mergedClusterCounts, file = mergedClusterCountsPath, sep="\t", row.names=FALSE )
+``` 
+
+Look at some cluster distributions
+```{r}
+fusionDist <- table(mergedClusterCounts$fusionClusterId)
+fusionDupDist <- table(fusionDist)
+fusionDupDist
+fusionDup <- fusionDist[fusionDist > 1]
+fusionDup
+for (clusterId in as.integer(unlist(dimnames(fusionDup)))) {
+  print(clusterAnnotatedFusions[clusterAnnotatedFusions$fusionClusterId == clusterId,][1,])
+}
+```
+
 
 ## Samples with probable false positives
 
