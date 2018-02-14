@@ -20,4 +20,3 @@ Load virus count file
 \examples{
 
 }
-

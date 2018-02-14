@@ -19,4 +19,3 @@ if a merged file.
 \description{
 Load a bed per-base coverage file
 }
-
