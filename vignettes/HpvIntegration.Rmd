@@ -174,7 +174,7 @@ knitr::kable(head(ends))
 Clustering end by window, creating numbered position-ranges that merge nearby fusion points, and reporting the original fusion list annotated with the clustering info.
 
 ```{r}
-windowSize <- 10
+windowSize <- 100000
 
 clusteredEnds <- clusterFusionEnds(ends, window= windowSize)
 str(clusteredEnds)
@@ -197,7 +197,7 @@ Now that we have fusion end ranges, report fusions by cluster.
 ```{r}
 clusterAnnotatedFusions <- clusterFusions(fusions, window= windowSize)
 knitr::kable(head(clusterAnnotatedFusions, 10))
-clusterAnnotatedFusionsFile <- "clusterAnnotatedFusions.tsv"
+clusterAnnotatedFusionsFile <- paste0("all.abra.sv.clustered.", windowSize, ".tsv")
 clusterAnnotatedFusionsPath <- file.path( dataRoot, clusterAnnotatedFusionsFile )
 write.table(clusterAnnotatedFusions, file = clusterAnnotatedFusionsPath, sep="\t")
 ```
@@ -211,7 +211,8 @@ knitr::kable(head(mergedClusterCounts, 10))
 
 Write out the fusion clusters file.
 ```{r}
-mergedClusterCountsFile <- "mergedClusterCounts.tsv"
+mergedClusterCountsFile <-
+  paste0( "all.abra.sv.clustered.aggregated.", windowSize, ".tsv" )
 mergedClusterCountsPath <- file.path( dataRoot, mergedClusterCountsFile )
 write.table(mergedClusterCounts, file = mergedClusterCountsPath, sep="\t", row.names=FALSE )
 ``` 
