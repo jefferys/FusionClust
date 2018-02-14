@@ -4,11 +4,22 @@
 \alias{readAbraSv}
 \title{Read an abra.sv file}
 \usage{
-readAbraSv(file, stranded = FALSE, orderedEnds = TRUE)
+readAbraSv(file, stranded = FALSE, orderedEnds = TRUE, tumorOnly = FALSE)
 }
 \arguments{
 \item{file}{The abra.sv fusion data file to load. Can be a single abra sv
 file, or a merged file with results for multuple samples.}
+
+\item{stranded}{Boolean indicating if the abra file has strand information.
+Currently, setting this TRUE will prevent processing as stradedness is not
+implemented. Default is FALSE.}
+
+\item{orderedEnds}{Boolean indicating if the output should order the two
+fusions ends canonically (ref, then pos), so the earlier one is first.
+Default is TRUE.}
+
+\item{tumorOnly}{Boolean indicating if the abra file has one column, e.g.
+tumor only or two columns of data, e.g. tumor and normal. Default is FALSE.}
 }
 \value{
 Returns a data frame describing the fusions, with columns:
@@ -37,4 +48,3 @@ svFile <- "tests/testthat/data/perSampleAbraSv.tsv"
 svFile <- system.file( svFile, package= "fusionClust" )
 fusions <- loadAbraSv( svFile )
 }
-
