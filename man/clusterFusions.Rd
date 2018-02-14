@@ -18,4 +18,3 @@ Data frame with fusions annotated by the cluster each end belongs to
 \description{
 Cluster fusions
 }
-

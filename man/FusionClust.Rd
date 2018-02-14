@@ -13,4 +13,3 @@ equal to the window distance apart. For two-ended grouping, ends are
 clustered separately and thenroups are merged when they contain opposite
 sides of the same fusion.
 }
-
