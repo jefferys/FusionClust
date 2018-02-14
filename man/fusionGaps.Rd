@@ -18,4 +18,3 @@ Merges the two enpoints into a single list of positions and spacings, then
 sorts, splits by chromosome, and calculates the \code{diff()} of successive
 endpints.
 }
-

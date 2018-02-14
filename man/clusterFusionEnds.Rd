@@ -21,4 +21,3 @@ belong to (adding columns clusterId, clusterLow, and clusterHigh).
 \description{
 Cluster and annotate a fusion end list
 }
-

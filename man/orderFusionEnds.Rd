@@ -19,4 +19,3 @@ them if the high end was first. Low means alphabetic ordering by chr, and
 then numeric ordering by position. No fusion can have the same left and right
 side as positions are the last included base on each end.
 }
-

@@ -7,6 +7,17 @@
 #' @param file The abra.sv fusion data file to load. Can be a single abra sv
 #' file, or a merged file with results for multuple samples.
 #'
+#' @param stranded Boolean indicating if the abra file has strand information.
+#' Currently, setting this TRUE will prevent processing as stradedness is not
+#' implemented. Default is FALSE.
+#'
+#' @param orderedEnds Boolean indicating if the output should order the two
+#' fusions ends canonically (ref, then pos), so the earlier one is first.
+#' Default is TRUE.
+#'
+#' @param tumorOnly Boolean indicating if the abra file has one column, e.g.
+#' tumor only or two columns of data, e.g. tumor and normal. Default is FALSE.
+#'
 #' @return Returns a data frame describing the fusions, with columns:
 #' \itemize{
 #'   \item{ \bold{sample} [optional] The sample this fusion came from.}
@@ -29,7 +40,7 @@
 #' svFile <- system.file( svFile, package= "fusionClust" )
 #' fusions <- loadAbraSv( svFile )
 #' @export
-readAbraSv <- function (file, stranded= FALSE, orderedEnds= TRUE) {
+readAbraSv <- function (file, stranded= FALSE, orderedEnds= TRUE, tumorOnly= FALSE) {
 
   # Can't handle stranded data
   if (stranded) {
@@ -40,21 +51,34 @@ readAbraSv <- function (file, stranded= FALSE, orderedEnds= TRUE) {
   }
 
   # Load data
-  df <- read.csv( file, header= FALSE, sep= "\t", stringsAsFactors= FALSE )
+  # Have to specify column classes as all "F" in orientation column will show
+  # up as FALSE.
+  df <- read.csv( file, header= FALSE, sep= "\t", stringsAsFactors= FALSE, colClasses = "character" )
 
   # Set row names equal to the line from the file
   rownames(df) <- 1:nrow(df)
 
   # Set input column names, may be single sample or merged cohort
-  names <- c( "group", "end1", "end2", "strand1", "strand2",
-              "normal_count", "tumor_count" )
-  keepColumns <- c("id", "group", "chr1", "pos1", "chr2", "pos2", "orientation",
-                   "normal_count", "tumor_count")
-  if ( ncol(df) == 8 ) {
+  countColumnNames = c("normal_count", "tumor_count")
+  if (tumorOnly) {
+    countColumnNames = c("tumor_count")
+  }
+
+  names <- c( "group", "end1", "end2", "strand1", "strand2", countColumnNames )
+  keepColumns <- c( "id", "group", "chr1", "pos1", "chr2", "pos2",
+                    "orientation", countColumnNames )
+
+  # Use column count to guess if have sample names.
+  withSample <- FALSE
+  if ((tumorOnly & ncol(df) == 7) | ( ! tumorOnly & ncol(df) == 8)) {
+    withSample <- TRUE
+  }
+
+  if (withSample) {
     names       <- c("sample", names)
     keepColumns <- c("sample", keepColumns)
   }
-  else if ( ncol(df) != 7 ) {
+  else if (( tumorOnly & ncol(df) != 6 ) | ( ! tumorOnly & ncol(df) != 7 )) {
     stop(
       "Doesn't look like an abra.sv file, has the wrong column count.",
       call.= FALSE
@@ -73,6 +97,12 @@ readAbraSv <- function (file, stranded= FALSE, orderedEnds= TRUE) {
   df$orientation <- paste0(df$strand1, df$strand2)
   df$orientation <- sub( "FR|RF", "I", df$orientation)
   df$orientation <- sub( "FF|RR", "", df$orientation)
+
+  # Convert data columns back to integers
+  df$tumor_count <- as.integer( df$tumor_count)
+  if (! tumorOnly ) {
+    df$normal_count <- as.integer( df$normal_count)
+  }
 
   # Set output column names, may be single sample or merged cohort
   df <- df[, keepColumns]

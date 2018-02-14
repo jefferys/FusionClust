@@ -17,4 +17,3 @@ hello()
 #> [1] "Hello, world!"
 
 }
-

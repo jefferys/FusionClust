@@ -39,4 +39,3 @@ svFile <- "tests/testthat/data/perSampleAbraSv.tsv"
 svFile <- system.file( svFile, package= "fusionClust" )
 fusions <- loadAbraSv( svFile )
 }
-
