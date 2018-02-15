@@ -397,26 +397,40 @@ loadBedCoverage <- function(file, merged=FALSE) {
 #'
 #' @param clusteredFusions The clustered fusion sites
 #'
+#' @param tumorOnly Set TRUE if tumor only fusion data, default is FALSE,
+#' implying tumor and normal pair.
+#'
 #' @return A data frame with the same columns as clusteredFusions, but with
 #' different entries for the same cluster in the same sample collapsed.
 #'
 #' @export
-mergeCountsByCluster <- function ( clusteredFusions ) {
-  sumColumns <- c("normal_count", "tumor_count")
-  byColumns <- c( "sample", "fusionClusterId", "chr1", "chr2",
-                  "end1Cluster", "end1ClusterLow", "end1ClusterHigh",
-                  "end2Cluster", "end2ClusterLow", "end2ClusterHigh" )
-  summed <- aggregate(
-    cbind(normal_count, tumor_count) ~
-      sample + fusionClusterId + chr1 + chr2 +
-      end1Cluster + end1ClusterLow + end1ClusterHigh +
-      end2Cluster + end2ClusterLow + end2ClusterHigh,
-    clusteredFusions[c(byColumns, sumColumns)],
-    FUN= sum
-  )
+mergeCountsByCluster <- function ( clusteredFusions, tumorOnly=FALSE) {
+	byColumns <- c( "sample", "fusionClusterId", "chr1", "chr2",
+					"end1Cluster", "end1ClusterLow", "end1ClusterHigh",
+					"end2Cluster", "end2ClusterLow", "end2ClusterHigh" )
+	if (! tumorOnly) {
+  		sumColumns <- c("normal_count", "tumor_count")
+  		summed <- aggregate(
+    		cbind(normal_count, tumor_count) ~
+      		sample + fusionClusterId + chr1 + chr2 +
+      		end1Cluster + end1ClusterLow + end1ClusterHigh +
+      		end2Cluster + end2ClusterLow + end2ClusterHigh,
+    		clusteredFusions[c(byColumns, sumColumns)],
+    		FUN= sum
+  		)
+	} else {
+		sumColumns <- c("tumor_count")
+		summed <- aggregate(
+			cbind(tumor_count) ~
+				sample + fusionClusterId + chr1 + chr2 +
+				end1Cluster + end1ClusterLow + end1ClusterHigh +
+				end2Cluster + end2ClusterLow + end2ClusterHigh,
+			clusteredFusions[c(byColumns, sumColumns)],
+			FUN= sum
+		)
+	}
 
-  summed[with(summed, order(sample, fusionClusterId)),]
-
+	summed[with(summed, order(sample, fusionClusterId)),]
 }
 
 #' Load virus count file
